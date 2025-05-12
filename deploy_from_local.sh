@@ -2,19 +2,15 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
+if [ -f .secrets/.env ]; then
+  export $(grep -v '^#' .secrets/.env | xargs)
 else
-  echo ".env file not found. Please create one with the required variables."
+  echo ".secrets/.env file not found. Please create one with the required variables."
   exit 1
 fi
 
-# Variables (loaded from .env)
-# RESOURCE_GROUP, WEBAPP_NAME, ZIP_FILE, STARTUP_FILE, LOCATION are expected to be defined in .env
-
-# Update requirements.txt in case you have downloaded new packages
-echo "Generating requirements.txt..."
-pip freeze > requirements.txt
+# Variables (loaded from .secrets/.env)
+# RESOURCE_GROUP, WEBAPP_NAME, ZIP_FILE, STARTUP_FILE, LOCATION are expected to be defined in .env located at .secrets/.env
 
 # Create a zip file excluding unnecessary files
 echo "Creating zip file..."
@@ -24,6 +20,10 @@ echo "Contents of the zip file:" && unzip -l $ZIP_FILE
 # Set the startup file configuration
 echo "Setting startup file configuration..."
 az webapp config set --startup-file $STARTUP_FILE --name $WEBAPP_NAME --resource-group $RESOURCE_GROUP
+
+# set env vars for cloud webapp
+echo "Setting environment vars"
+az webapp config appsettings set -n $WEBAPP_NAME -g $RESOURCE_GROUP --settings @.secrets/appsettings.json
 
 # Deploy the zip file to the web app
 echo "Deploying zip file to Azure Web App..."

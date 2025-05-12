@@ -1,0 +1,33 @@
+# Ignore all files and folders starting with .
+.*
+
+# Allow .gitignore itself
+!.gitignore
+
+# Python-related ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+*.orig
+*.DS_Store
+
+# Ignore zip files
+*.zip
+
+# Ignore database files
+users.db
