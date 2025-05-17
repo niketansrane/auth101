@@ -1,83 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Borrowed Books</title>
+
+    <!-- Base Styling -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            animation: fadeIn 0.8s ease-in;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 850px;
+            margin: 40px auto;
             background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            animation: fadeUp 0.6s ease-in-out;
         }
 
         h1 {
-            color: #333333;
             text-align: center;
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        strong {
+            color: #007bff;
         }
 
-        table, th, td {
-            border: 1px solid #cccccc;
+        code {
+            font-family: monospace;
+            background-color: #eef1f5;
+            border-radius: 6px;
+            padding: 5px 10px;
+            display: block;
+            margin: 10px auto;
+            width: fit-content;
         }
 
-        th, td {
-            padding: 10px;
-            text-align: left;
+        .json-container {
+            margin-top: 30px;
         }
 
-        th {
-            background-color: #007bff;
-            color: #ffffff;
+        pre {
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 6px;
+            overflow-x: auto;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            /* Set a fixed width */
+            height: 100px;
+            /* Set a fixed height */
+            border-radius: 50%;
+            /* Make it circular */
+            object-fit: cover;
+            /* Ensure the image fits within the dimensions */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .logout-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .logout-button {
+            background-color: #ff4d4d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #e60000;
         }
     </style>
+
+    <!-- Highlight.js for JSON -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
 </head>
+
 <body>
     <div class="container">
-        <h1>Borrowed Books</h1>
-        <p><strong>Username:</strong> {{ username }}</p>
+        <div class="logout-container">
+            <a href="/logout" class="logout-button">Logout</a>
+        </div>
+        <h1>Welcome, <strong>{{ username }}</strong></h1>
+        <div class="profile-card">
+            <img src="{{ decoded_token.picture if decoded_token.picture else 'https://robohash.org/default-avatar.png?set=set4' }}"
+                alt="Profile Picture" class="profile-pic" />
+            <div class="profile-info">
+                <h2>{{ decoded_token.name }}</h2>
+                <p>{{ decoded_token.email }}</p>
+                {% if decoded_token.preferred_username %}
+                <p><em>{{ decoded_token.preferred_username }}</em></p>
+                {% endif %}
+            </div>
+        </div>
 
-        {% if books %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Book Title</th>
-                        <th>Borrow Date</th>
-                        <th>Due Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for book in books %}
-                        <tr>
-                            <td>{{ book['title'] }}</td>
-                            <td>{{ book['borrow_date'] }}</td>
-                            <td>{{ book['due_date'] }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No books borrowed yet.</p>
+        <code>Here the app can show user-related content (e.g., borrowed books)</code>
+
+        {% if decoded_token %}
+        <div class="json-container">
+            <p><strong>Decoded Token:</strong></p>
+            <pre><code class="language-json">{{ decoded_token | tojson(indent=2) }}</code></pre>
+        </div>
         {% endif %}
     </div>
+
+    <!-- Highlight.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
 </body>
+
 </html>
